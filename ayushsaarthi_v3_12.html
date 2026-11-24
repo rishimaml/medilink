@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AyushSaarthi — Digital OPD Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F8FAFC; --bg-soft:#F1F5F9; --surface:#FFFFFF;
+    --text:#0F172A; --text-muted:#64748B; --border:#E2E8F0;
+    --green:#0F766E; --green-deep:#115E59; --sage:#E0F5F2;
+    --saffron:#F59E0B; --saffron-deep:#B45309; --red:#DC2626; --blue:#2563EB;
+    --primary:#0F766E; --primary-hover:#115E59; --primary-text:#ffffff;
+    --shadow:0 10px 30px rgba(15,23,42,0.08);
+  }
+  body[data-theme="dark"]{
+    --bg:#0B1220; --bg-soft:#111A2E; --surface:#152036;
+    --text:#E8EEF8; --text-muted:#94A3B8; --border:#23314D;
+    --green:#2DD4BF; --green-deep:#14B8A6; --sage:#10303A;
+    --saffron:#FBBF24; --saffron-deep:#F59E0B; --red:#F87171; --blue:#60A5FA;
+    --primary:#14B8A6; --primary-hover:#2DD4BF; --primary-text:#062925;
+    --shadow:0 10px 30px rgba(0,0,0,0.45);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s;}
+  h1,h2,h3,.serif{font-family:'Inter', sans-serif;}
+  a{color:inherit;}
+  ::selection{background:var(--green); color:#fff;}
+
+  /* ---------------- SITE HEADER ---------------- */
+  header.site{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 40px; border-bottom:1px solid var(--border);
+    background:var(--bg); position:sticky; top:0; z-index:100; flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:11px; cursor:pointer;}
+  .brand-mark{width:34px;height:34px;flex-shrink:0;}
+  .brand-name{font-family:'Inter'; font-weight:700; font-size:19px; color:var(--green);}
+  .brand-sub{font-size:10.5px; color:var(--text-muted); margin-top:1px;}
+  nav.site-nav{display:flex; align-items:center; gap:26px;}
+  nav.site-nav a{font-size:13.5px; font-weight:600; color:var(--text-muted); text-decoration:none; cursor:pointer;}
+  nav.site-nav a:hover{color:var(--text);}
+  .header-right{display:flex; align-items:center; gap:12px;}
+  .theme-toggle{
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--surface);
+    cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+  .btn{font-family:'Inter'; font-weight:600; font-size:13.5px; padding:9px 18px; border-radius:9px; border:none; cursor:pointer; transition:background .15s;}
+  .btn-primary{background:var(--primary); color:var(--primary-text);}
+  .btn-primary:hover{background:var(--primary-hover);}
+  .btn-ghost{background:transparent; color:var(--text); border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--bg-soft);}
+  .btn-saffron{background:var(--saffron); color:#fff;}
+  .btn-blue{background:var(--blue); color:#fff;}
+  .btn:disabled{opacity:.4; cursor:not-allowed;}
+  .user-chip{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; background:var(--sage); padding:6px 14px; border-radius:20px; color:var(--green);}
+
+  main{max-width:1240px; margin:0 auto;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------------- HOME / LANDING ---------------- */
+  .hero{padding:80px 40px 60px; display:flex; gap:50px; align-items:center; flex-wrap:wrap;}
+  .hero-text{flex:1.1; min-width:320px;}
+  .eyebrow-note{font-size:13px; color:var(--saffron-deep); font-weight:600; margin-bottom:10px;}
+  .hero h1{font-size:44px; line-height:1.12; margin:0 0 18px; max-width:16ch;}
+  .hero p.lead{font-size:16px; color:var(--text-muted); max-width:52ch; margin:0 0 28px; line-height:1.6;}
+  .hero-ctas{display:flex; gap:14px; flex-wrap:wrap;}
+  .hero-visual{flex:1; min-width:300px;}
+  .stat-strip{display:flex; gap:0; margin-top:46px; border-top:1px solid var(--border); padding-top:24px; flex-wrap:wrap; gap:36px;}
+  .stat-item .num{font-family:'Inter'; font-size:30px; font-weight:700; color:var(--green);}
+  .stat-item .lbl{font-size:12px; color:var(--text-muted); margin-top:2px;}
+
+  .card-visual{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:22px; box-shadow:var(--shadow);}
+  .card-visual .mini-row{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--bg-soft); font-size:13px;}
+  .card-visual .mini-row:last-child{border-bottom:none;}
+
+  section.features{padding:20px 40px 60px;}
+  section.features h2{font-size:28px; margin:0 0 8px; text-align:center;}
+  section.features > p{text-align:center; color:var(--text-muted); max-width:60ch; margin:0 auto 36px;}
+  .feature-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:20px;}
+  .feature-card{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:22px;}
+  .feature-card .ico{font-size:24px; margin-bottom:12px;}
+  .feature-card h3{font-size:16px; margin:0 0 6px;}
+  .feature-card p{font-size:13.3px; color:var(--text-muted); margin:0; line-height:1.55;}
+
+  section.portals{padding:20px 40px 80px; display:flex; gap:24px; flex-wrap:wrap;}
+  .portal-card{flex:1; min-width:280px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; text-align:left;}
+  .portal-card h3{font-size:20px; margin:0 0 8px;}
+  .portal-card p{font-size:13.5px; color:var(--text-muted); margin:0 0 20px; line-height:1.6;}
+
+  footer.site-footer{padding:26px 40px; border-top:1px solid var(--border); text-align:center; font-size:11.5px; color:var(--text-muted);}
+
+  /* ---------------- LOGIN ---------------- */
+  .login-wrap{min-height:70vh; display:flex; align-items:center; justify-content:center; padding:60px 20px;}
+  .login-card{width:100%; max-width:400px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:34px; box-shadow:var(--shadow);}
+  .login-card h2{margin:0 0 6px; font-size:22px;}
+  .login-card p.sub{font-size:13px; color:var(--text-muted); margin:0 0 22px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:12.5px; font-weight:600; color:var(--text-muted); margin-bottom:6px;}
+  .field input, .field textarea, .field select{
+    width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px;
+    font-family:'Inter'; font-size:14px; background:var(--bg); color:var(--text);
+  }
+  .login-hint{font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.6;}
+  .login-hint b{color:var(--text);}
+  .login-error{font-size:12px; color:var(--red); margin-top:8px; display:none;}
+
+  /* ---------------- DASHBOARD SHELL ---------------- */
+  .dash-shell{display:flex; min-height:78vh;}
+  .dash-side{width:230px; flex-shrink:0; border-right:1px solid var(--border); padding:26px 16px; background:var(--bg-soft);}
+  .dash-profile{display:flex; align-items:center; gap:10px; padding:0 8px 20px; margin-bottom:14px; border-bottom:1px solid var(--border);}
+  .avatar{width:38px;height:38px;border-radius:50%; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;}
+  .dash-profile .nm{font-size:13.5px; font-weight:700;}
+  .dash-profile .rl{font-size:11px; color:var(--text-muted);}
+  .side-link{display:block; width:100%; text-align:left; background:none; border:none; padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:600; color:var(--text-muted); cursor:pointer; margin-bottom:2px;}
+  .side-link:hover{background:var(--surface);}
+  .side-link.active{background:var(--surface); color:var(--green); box-shadow:0 0 0 1px var(--border);}
+  .side-logout{margin-top:18px; padding-top:14px; border-top:1px solid var(--border);}
+
+  .dash-main{flex:1; padding:30px 36px;}
+  .dash-main h2{margin:0 0 4px; font-size:22px;}
+  .dash-main > p.sub{color:var(--text-muted); font-size:13.5px; margin:0 0 22px;}
+
+  .card-block{border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:16px; background:var(--surface);}
+  .card-block h4{margin:0 0 10px; font-size:12.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--green); font-weight:700;}
+  .grid-3{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px;}
+  .stat-card{background:var(--bg-soft); border-radius:10px; padding:14px 16px;}
+  .stat-card .num{font-family:'Inter'; font-size:24px; font-weight:700; color:var(--green);}
+  .stat-card .lbl{font-size:11.5px; color:var(--text-muted); margin-top:2px;}
+
+  .chip-row{display:flex; flex-wrap:wrap; gap:7px;}
+  .chip{padding:7px 12px; border-radius:16px; border:1px solid var(--border); font-size:12.5px; cursor:pointer; background:var(--bg); color:var(--text); user-select:none;}
+  .chip.on{background:var(--green); color:#fff; border-color:var(--green);}
+  .icd-list{margin-top:10px; display:flex; flex-direction:column; gap:6px;}
+  .icd-row{display:flex; justify-content:space-between; align-items:center; background:var(--bg-soft); border:1px solid var(--border); border-radius:7px; padding:6px 10px; font-size:11.8px; color:var(--text-muted);}
+  .icd-code{font-weight:700; color:var(--saffron-deep);}
+  .conf-bar{width:60px; height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-left:8px;}
+  .conf-fill{height:100%; background:var(--saffron);}
+  .vital-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px;}
+  .vitals-row{display:flex; gap:18px; flex-wrap:wrap;}
+  .vital-pill{background:var(--bg-soft); border-radius:8px; padding:8px 12px; text-align:center; min-width:74px;}
+  .vital-pill .v{font-weight:700; font-size:15px;}
+  .vital-pill .l{font-size:10.5px; color:var(--text-muted);}
+
+  .ai-summary-box{background:var(--bg-soft); border:1px solid var(--border); border-radius:10px; padding:14px 16px; font-size:13.6px; line-height:1.65;}
+  .ai-summary-box .badge{display:inline-block; font-size:10.5px; background:var(--saffron); color:#fff; padding:2px 8px; border-radius:10px; margin-bottom:8px; font-weight:600;}
+  .conf-badge{display:inline-block; font-size:10.5px; background:var(--sage); color:var(--green); padding:2px 8px; border-radius:10px; margin-bottom:8px; margin-left:6px; font-weight:600;}
+  .review-actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+  .rx-row{display:flex; gap:8px; margin-bottom:8px;}
+  .rx-row input{flex:1;}
+
+  /* timeline */
+  .timeline{border-left:2px solid var(--border); margin-left:8px; padding-left:20px;}
+  .tl-item{position:relative; margin-bottom:18px;}
+  .tl-item::before{content:""; position:absolute; left:-26.5px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--green); border:2.5px solid var(--bg);}
+  .tl-date{font-size:12px; color:var(--text-muted); margin-bottom:4px; font-weight:600;}
+  .tl-body{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px;}
+  .tl-body h4{margin:0 0 6px; font-size:14px; font-family:'Inter';}
+
+  /* patient list (doctor) */
+  .patient-list-row{display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; cursor:pointer; background:var(--surface);}
+  .patient-list-row:hover{background:var(--bg-soft);}
+  .patient-list-row.active{border-color:var(--green); background:var(--sage);}
+  .p-name{font-weight:700; font-size:14px;}
+  .p-meta{font-size:11.5px; color:var(--text-muted);}
+  .flag-dot{width:8px;height:8px;border-radius:50%;background:var(--red); display:inline-block;}
+  .new-badge{font-size:10px; background:var(--saffron); color:#fff; padding:2px 6px; border-radius:8px;}
+  .two-col{display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start;}
+  @media(max-width:820px){ .two-col{grid-template-columns:1fr;} }
+
+  .lang-toggle{display:flex; gap:4px; background:var(--bg-soft); border-radius:8px; padding:3px;}
+  .lang-toggle button{border:none; background:none; padding:5px 10px; font-size:12px; border-radius:6px; cursor:pointer; color:var(--text-muted);}
+  .lang-toggle button.on{background:var(--green); color:#fff;}
+
+  /* OCR */
+  .ocr-wrap{display:flex; gap:22px; flex-wrap:wrap;}
+  .ocr-upload{flex:1; min-width:260px; border:2px dashed var(--border); border-radius:14px; padding:24px; text-align:center; background:var(--surface);}
+  .ocr-upload img{max-width:100%; max-height:200px; border-radius:8px; margin-top:12px; border:1px solid var(--border);}
+  .scan-progress{height:6px; background:var(--bg-soft); border-radius:3px; overflow:hidden; margin-top:14px; display:none;}
+  .scan-progress.show{display:block;}
+  .scan-progress .bar{height:100%; width:0%; background:var(--saffron); transition:width 1.4s linear;}
+  .ocr-result{flex:1; min-width:260px;}
+  .ocr-field-row{display:flex; justify-content:space-between; align-items:center; padding:9px 12px; border-bottom:1px solid var(--bg-soft); font-size:13px;}
+  .ocr-field-row .k{color:var(--text-muted); font-weight:600;}
+  .lang-tag{font-size:10.5px; background:var(--sage); color:var(--green); padding:2px 8px; border-radius:10px; font-weight:600;}
+
+  /* queue */
+  .now-serving{background:var(--green); color:#fff; border-radius:14px; padding:20px 24px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
+  .now-serving .label{font-size:11.5px; opacity:.85; letter-spacing:.03em; text-transform:uppercase;}
+  .now-serving .name{font-family:'Inter'; font-size:21px; font-weight:600; margin-top:2px;}
+  .now-serving .room{font-size:12.5px; opacity:.85; margin-top:2px;}
+  .queue-table{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden;}
+  .queue-table th{text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.02em; color:var(--text-muted); padding:10px 14px; background:var(--bg-soft); border-bottom:1px solid var(--border);}
+  .queue-table td{padding:11px 14px; font-size:13.5px; border-bottom:1px solid var(--bg-soft);}
+  .status-tag{font-size:11px; padding:3px 9px; border-radius:10px; font-weight:600;}
+  .status-waiting{background:#F1EBD9; color:#8a6a1f;}
+  body[data-theme="dark"] .status-waiting{background:#3a331d; color:#e8c07a;}
+  .status-serving{background:var(--sage); color:var(--green);}
+
+  /* chat */
+  .chat-frame-box{background:var(--green-deep); border-radius:16px; padding:10px; box-shadow:var(--shadow);}
+  .chat-frame-box iframe{width:100%; height:560px; border:none; border-radius:10px; background:#fff;}
+  .chat-fallback{display:none; padding:24px; text-align:center; color:var(--text-muted); font-size:13px;}
+
+  .info-note{background:var(--sage); border-left:4px solid var(--green); padding:12px 14px; border-radius:0 8px 8px 0; font-size:13px; color:var(--text);}
+
+  /* ---------------- MODERN CLEAN REFRESH ---------------- */
+  h1,h2,h3{letter-spacing:-0.02em;}
+  header.site{background:color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); padding:14px 40px;}
+  .brand-name{font-weight:800; letter-spacing:-0.02em;}
+  .brand-sub{font-size:11px;}
+  .btn{border-radius:10px; padding:10px 20px; font-weight:600;}
+  .btn-primary{box-shadow:0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);}
+  .btn-ghost{background:var(--surface);}
+  .theme-toggle{box-shadow:0 1px 2px rgba(15,23,42,.06);}
+  .hero{padding:90px 40px 70px; position:relative;}
+  .hero::before{content:""; position:absolute; inset:0 -9999px; margin:auto; z-index:-1;
+    background:radial-gradient(900px 400px at 15% 0%, color-mix(in srgb, var(--green) 14%, transparent), transparent 70%),
+               radial-gradient(700px 360px at 95% 20%, color-mix(in srgb, var(--saffron) 14%, transparent), transparent 70%);}
+  .hero h1{font-size:52px; font-weight:800; line-height:1.08; max-width:18ch;}
+  .hero p.lead{font-size:17px;}
+  .eyebrow-note{display:inline-block; background:var(--sage); color:var(--green); padding:5px 12px; border-radius:20px; font-size:12.5px;}
+  .stat-item .num{font-size:32px; font-weight:800;}
+  .card-visual,.login-card,.portal-card,.feature-card,.card-block,.tl-body,.patient-list-row,.queue-table{border-radius:16px; box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .card-visual,.login-card{box-shadow:var(--shadow);}
+  .feature-card,.portal-card{transition:transform .2s, box-shadow .2s;}
+  .feature-card:hover,.portal-card:hover{transform:translateY(-3px); box-shadow:var(--shadow);}
+  .feature-card .ico{width:46px; height:46px; display:flex; align-items:center; justify-content:center; background:var(--sage); border-radius:12px; font-size:22px;}
+  section.features h2{font-size:32px; font-weight:800;}
+  .dash-side{background:var(--surface);}
+  .side-link{border-radius:10px;}
+  .side-link.active{background:var(--sage); box-shadow:none;}
+  .avatar{background:linear-gradient(135deg,var(--green),var(--blue));}
+  .field input,.field textarea,.field select{border-radius:10px; background:var(--surface);}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none; border-color:var(--green); box-shadow:0 0 0 3px color-mix(in srgb, var(--green) 20%, transparent);}
+  .now-serving{background:linear-gradient(135deg,var(--green-deep),var(--green)); border-radius:16px;}
+  .tl-body h4,.now-serving .name,.stat-card .num{font-weight:700;}
+  .chip{background:var(--surface);}
+  .queue-table th{background:var(--bg-soft);}
+  .status-waiting{background:#FEF3C7; color:#92400E;}
+  body[data-theme="dark"] .status-waiting{background:#3a2f10; color:#FCD34D;}
+  @media(max-width:700px){ header.site{padding:12px 18px;} .hero{padding:50px 20px 40px;} .hero h1{font-size:36px;} .dash-main{padding:22px 18px;} section.features,section.portals{padding-left:20px; padding-right:20px;} }
+</style>
+</head>
+<body data-theme="light">
+
+<header class="site">
+  <div class="brand" id="logoHome">
+    <svg class="brand-mark" viewBox="0 0 48 48" fill="none">
+      <path d="M24 4C14 10 8 20 8 28c0 8.8 7.2 16 16 16s16-7.2 16-16C40 20 34 10 24 4Z" fill="var(--green)"/>
+      <path d="M24 12c-3 5-3 10 0 22" stroke="var(--saffron)" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div><div class="brand-name">AyushSaarthi</div><div class="brand-sub">Digital OPD Platform</div></div>
+  </div>
+  <nav class="site-nav" id="publicNav">
+    <a data-scroll="featuresSec">Features</a>
+    <a data-scroll="portalsSec">Portals</a>
+  </nav>
+  <div class="header-right">
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    <span id="loggedInChip" style="display:none;"></span>
+    <button class="btn btn-ghost" id="navPatientLoginBtn">Patient Login</button>
+    <button class="btn btn-primary" id="navDoctorLoginBtn">Doctor Login</button>
+    <button class="btn btn-ghost" id="logoutBtn" style="display:none;">Log out</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= HOME ================= -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <div class="hero-text">
+        <div class="eyebrow-note">MedTech / BioTech · HealthTech</div>
+        <h1>One record, from the OPD kiosk to the doctor's desk.</h1>
+        <p class="lead">AyushSaarthi captures a patient's case once — symptoms, vitals, old prescriptions — and turns it into an AI-drafted, doctor-reviewed clinical summary before they even sit down for consultation.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" id="heroPatientBtn">View my medical history</button>
+          <button class="btn btn-ghost" id="heroDoctorBtn">Doctor dashboard</button>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-item"><div class="num">30–40%</div><div class="lbl">less OPD waiting time</div></div>
+          <div class="stat-item"><div class="num">80%</div><div class="lbl">less paperwork</div></div>
+          <div class="stat-item"><div class="num">25–35%</div><div class="lbl">less time on history-taking</div></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="card-visual">
+          <div class="mini-row"><span>Sunita Devi — checked in</span><span class="status-tag status-waiting">Waiting</span></div>
+          <div class="mini-row"><span>Ramesh Yadav — in consultation</span><span class="status-tag status-serving">Room 2</span></div>
+          <div class="mini-row"><span>AI summary drafted</span><span>91% confidence</span></div>
+          <div class="mini-row"><span>Prescription scanned (OCR)</span><span>93% match</span></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="features" id="featuresSec">
+      <h2>Built around one case file</h2>
+      <p>Everything a patient does and everything a doctor sees pulls from the same record — no re-typing, no lost paper.</p>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="ico">📝</div><h3>Guided case-taking</h3><p>Structured intake with voice or text, mapped to clinical codes as the patient answers.</p></div>
+        <div class="feature-card"><div class="ico">🧠</div><h3>AI-drafted summaries</h3><p>Every case gets a confidence-scored draft summary — the doctor always makes the final call.</p></div>
+        <div class="feature-card"><div class="ico">📄</div><h3>Prescription scanner</h3><p>Old paper prescriptions and lab reports are read automatically, in Hindi, English or a mix.</p></div>
+        <div class="feature-card"><div class="ico">👥</div><h3>Live OPD queue</h3><p>Reception and doctors see who's waiting, who's in consultation, and how long the line is — in real time.</p></div>
+        <div class="feature-card"><div class="ico">📚</div><h3>Complete medical history</h3><p>Patients log in and see every past visit, diagnosis and prescription in one timeline.</p></div>
+        <div class="feature-card"><div class="ico">💬</div><h3>Support chatbot</h3><p>Answers common questions about timings and visit prep, so the front desk isn't interrupted.</p></div>
+      </div>
+    </section>
+
+    <section class="portals" id="portalsSec">
+      <div class="portal-card">
+        <h3>For patients</h3>
+        <p>Log in with your name to see your full medical history, start a new visit, or scan an old prescription.</p>
+        <button class="btn btn-primary" id="portalPatientBtn">Go to patient login</button>
+      </div>
+      <div class="portal-card">
+        <h3>For doctors &amp; staff</h3>
+        <p>Review AI-drafted summaries, manage the live OPD queue, and confirm prescriptions.</p>
+        <button class="btn btn-primary" id="portalDoctorBtn">Go to doctor login</button>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= PATIENT LOGIN ================= -->
+  <section class="view" id="view-patientLogin">
+    <div class="login-wrap">
+      <div class="login-card">
+        <h2>Patient login</h2>
+        <p class="sub">Enter your name to view your medical history.</p>
+        <div class="field"><label>Full name</label><input id="patientLoginName" placeholder="e.g. Sunita Devi"></div>
+        <button class="btn btn-primary" style="width:100%;" id="patientLoginBtn">View my records</button>
+        <div class="login-error" id="patientLoginError">No record found with that exact name — try again or check spelling.</div>
+        <div class="login-hint">Demo accounts with history already on file: <b>Sunita Devi</b>, <b>Ramesh Yadav</b>, <b>Kamla Bai</b>, <b>Arjun Mehta</b>. Any other name logs in as a first-time patient.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DOCTOR LOGIN ================= -->
+  <section class="view" id="view-doctorLogin">
+    <div class="login-wrap">
+      <div class="login-card">
+        <h2>Doctor / staff login</h2>
+        <p class="sub">Enter your name to open the clinic dashboard.</p>
+        <div class="field"><label>Name</label><input id="doctorLoginName" placeholder="e.g. Dr. Menon" value="Dr. Menon"></div>
+        <button class="btn btn-primary" style="width:100%;" id="doctorLoginBtn">Open dashboard</button>
+        <div class="login-hint">This dashboard shows every patient checked in at the clinic today, with AI-drafted summaries queued for review.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PATIENT DASHBOARD ================= -->
+  <section class="view" id="view-patientDashboard">
+    <div class="dash-shell">
+      <aside class="dash-side">
+        <div class="dash-profile"><div class="avatar" id="patAvatar">S</div><div><div class="nm" id="patName">—</div><div class="rl">Patient</div></div></div>
+        <button class="side-link" data-psub="overview">Overview</button>
+        <button class="side-link" data-psub="history">Medical History</button>
+        <button class="side-link" data-psub="newvisit">New Visit</button>
+        <button class="side-link" data-psub="scan">Scan Documents</button>
+        <button class="side-link" data-psub="support">Support Chat</button>
+      </aside>
+      <div class="dash-main" id="patientMain"></div>
+    </div>
+  </section>
+
+  <!-- ================= DOCTOR DASHBOARD ================= -->
+  <section class="view" id="view-doctorDashboard">
+    <div class="dash-shell">
+      <aside class="dash-side">
+        <div class="dash-profile"><div class="avatar" id="docAvatar">M</div><div><div class="nm" id="docName">—</div><div class="rl">Doctor</div></div></div>
+        <button class="side-link" data-dsub="overview">Overview</button>
+        <button class="side-link" data-dsub="queue">OPD Queue</button>
+        <button class="side-link" data-dsub="patients">Patients</button>
+      </aside>
+      <div class="dash-main" id="doctorMain"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">AyushSaarthi prototype — demo data only. Contact: <a href="mailto:jainrish01@gmail.com">jainrish01@gmail.com</a></footer>
+
+<script>
+/* ==================================================================
+   THEME
+   ================================================================== */
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', ()=>{
+  const body = document.body;
+  const isDark = body.getAttribute('data-theme')==='dark';
+  body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeToggle.textContent = isDark ? '🌙' : '☀️';
+});
+
+/* ==================================================================
+   VIEW ROUTING
+   ================================================================== */
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.getElementById('logoHome').addEventListener('click', ()=>showView('view-home'));
+document.querySelectorAll('[data-scroll]').forEach(a=>{
+  a.addEventListener('click', ()=>{
+    showView('view-home');
+    setTimeout(()=>{ document.getElementById(a.dataset.scroll).scrollIntoView({behavior:'smooth'}); }, 50);
+  });
+});
+['navPatientLoginBtn','heroPatientBtn','portalPatientBtn'].forEach(id=>{
+  document.getElementById(id).addEventListener('click', ()=>showView('view-patientLogin'));
+});
+['navDoctorLoginBtn','heroDoctorBtn','portalDoctorBtn'].forEach(id=>{
+  document.getElementById(id).addEventListener('click', ()=>showView('view-doctorLogin'));
+});
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  currentPatient = null; currentDoctor = null;
+  document.getElementById('logoutBtn').style.display='none';
+  document.getElementById('loggedInChip').style.display='none';
+  document.getElementById('navPatientLoginBtn').style.display='inline-block';
+  document.getElementById('navDoctorLoginBtn').style.display='inline-block';
+  showView('view-home');
+});
+
+/* ==================================================================
+   DATA
+   ================================================================== */
+const icdMap = {
+  'Joint pain':{code:'M25.5', conf:94}, 'Cough':{code:'R05', conf:91}, 'Fever':{code:'R50.9', conf:97},
+  'Headache':{code:'R51', conf:89}, 'Fatigue':{code:'R53.83', conf:86}, 'Poor appetite':{code:'R63.0', conf:83},
+  'Sore throat':{code:'J02.9', conf:92}, 'Body ache':{code:'M79.1', conf:88}, 'Skin rash':{code:'R21', conf:90},
+  'Digestive issue':{code:'K30', conf:85},
+};
+const symptomOptions = Object.keys(icdMap);
+
+const seedPatients = [
+  { id:'p1', name:'Sunita Devi', age:52, gender:'Female', village:'Kotra, Rajasthan',
+    history:'Known hypertension for 6 years. No known allergies.',
+    visits:[
+      {date:'02 May 2026', vitals:{bp:'136/84',pulse:'80',temp:'98.2°F',spo2:'97%'}, symptoms:['Headache'], notes:'Occasional headaches, resolved with rest.', summary:'Mild, self-limiting headache episodes, likely stress-related. No red flags. Advised hydration and rest.', rx:['Paracetamol 500mg SOS']},
+      {date:'19 Jun 2026', vitals:{bp:'140/88',pulse:'82',temp:'98.6°F',spo2:'97%'}, symptoms:['Joint pain','Fatigue'], notes:'Knee discomfort after long walks, mild fatigue.', summary:'Early Vata-type joint discomfort with fatigue. Suggested warm oil massage and dietary review.', rx:['Warm sesame oil massage, twice daily']}
+    ],
+    today:{ vitals:{bp:'138/86', pulse:'78', temp:'98.4°F', spo2:'97%'}, symptoms:['Joint pain','Fatigue','Poor appetite'],
+      notes:'Patient reports morning stiffness in knees for the past 3 weeks, worse in cold weather. Denies fever.',
+      flag:true, confidence:91,
+      summary:"52F with 6-yr history of hypertension presents with 3 weeks of morning joint stiffness (knees), fatigue and reduced appetite, no fever. Pattern is consistent with an Ama-Vata type presentation in Ayurvedic assessment — cold-aggravated joint stiffness with digestive weakness. Suggest Vata-pacifying dietary advice, warm oil (Sneha) application, and BP recheck given existing hypertension history.",
+      rx:['Erandapaka - 1 tsp at bedtime','Warm sesame oil massage to knees, twice daily','Dietary: avoid cold, raw foods for 2 weeks'],
+      queueStatus:'waiting', arrival:'9:40 AM', estWait:15, date:'06 Sep 2026' }
+  },
+  { id:'p2', name:'Ramesh Yadav', age:34, gender:'Male', village:'Bilaspur, Chhattisgarh',
+    history:'No chronic conditions on record.',
+    visits:[
+      {date:'11 Mar 2026', vitals:{bp:'118/78',pulse:'74',temp:'98.4°F',spo2:'98%'}, symptoms:['Digestive issue'], notes:'Mild indigestion after spicy food.', summary:'Transient Agnimandya, resolved with dietary advice.', rx:['Ginger tea before meals']}
+    ],
+    today:{ vitals:{bp:'122/80', pulse:'88', temp:'99.6°F', spo2:'98%'}, symptoms:['Cough','Sore throat','Fever'],
+      notes:'3-day history of dry cough and throat irritation, mild fever since yesterday evening. Works outdoors in dusty conditions.',
+      flag:false, confidence:88,
+      summary:"34M, otherwise healthy, presents with 3-day dry cough, throat irritation and low-grade fever (99.6°F) since last evening. Occupational dust exposure noted. Presentation fits a Kapha-Pitta imbalance affecting the throat (Kantha). No red-flag signs of respiratory distress recorded. Suggest supportive Kashaya, steam inhalation, and review in 3 days if fever persists beyond 48 hrs.",
+      rx:['Sitopaladi Churna with honey, 3x daily','Steam inhalation with Tulsi, twice daily','Return if fever crosses 100.5°F'],
+      queueStatus:'serving', arrival:'9:10 AM', estWait:0, date:'06 Sep 2026' }
+  },
+  { id:'p3', name:'Kamla Bai', age:61, gender:'Female', village:'Kotra, Rajasthan',
+    history:'Diabetic, on Metformin for 4 years.',
+    visits:[
+      {date:'28 Jan 2026', vitals:{bp:'144/90',pulse:'80',temp:'98.4°F',spo2:'96%'}, symptoms:['Body ache'], notes:'General body ache, sugar levels borderline high.', summary:'Advised sugar monitoring and mild Panchakarma-adjacent lifestyle changes.', rx:['Sugar monitoring twice weekly']}
+    ],
+    today:{ vitals:{bp:'146/92', pulse:'82', temp:'98.2°F', spo2:'96%'}, symptoms:['Headache','Body ache'],
+      notes:'Recurring headaches over past week, worse by evening. No visual disturbance reported.',
+      flag:true, confidence:85,
+      summary:"61F, known diabetic on Metformin, reports recurring evening headaches for a week with general body ache, no visual disturbance. Given hypertension reading (146/92) and diabetic history, recommend BP monitoring and blood sugar check before symptomatic treatment. Consider Pitta-aggravation pattern given evening worsening.",
+      rx:[], queueStatus:'waiting', arrival:'9:55 AM', estWait:28, date:'06 Sep 2026' }
+  },
+  { id:'p4', name:'Arjun Mehta', age:29, gender:'Male', village:'Udaipur, Rajasthan',
+    history:'No known conditions.',
+    visits:[],
+    today:{ vitals:{bp:'118/76', pulse:'72', temp:'98.6°F', spo2:'99%'}, symptoms:['Digestive issue'],
+      notes:'Bloating and mild discomfort after meals for 2 weeks.',
+      flag:false, confidence:82,
+      summary:"29M reports post-meal bloating and mild abdominal discomfort for 2 weeks, no other red flags. Likely Agnimandya (weak digestive fire). Suggest dietary review and light Deepana-Pachana measures pending doctor confirmation.",
+      rx:[], queueStatus:'waiting', arrival:'10:05 AM', estWait:38, date:'06 Sep 2026' }
+  }
+];
+let patients = JSON.parse(JSON.stringify(seedPatients));
+let currentPatient = null;
+let currentDoctor = null;
+let activeDoctorPatientId = null;
+let currentLang = 'en';
+const hindiNote = "सारांश: मरीज के लक्षणों के आधार पर एक प्रारंभिक मूल्यांकन तैयार किया गया है। कृपया डॉक्टर पुष्टि करें।";
+
+function avgConfidence(symptoms){
+  if(!symptoms.length) return 80;
+  return Math.round(symptoms.reduce((s,x)=>s+(icdMap[x]?.conf||80),0)/symptoms.length);
+}
+function generateAISummary(p, symptoms, vitals, notes){
+  const sx = symptoms.join(', ').toLowerCase() || 'no specific symptoms recorded';
+  return `${p.age||'—'}${p.gender?p.gender[0]:''} presents with ${sx}. Vitals recorded as BP ${vitals.bp}, pulse ${vitals.pulse}, temperature ${vitals.temp}. Clinical notes: "${notes || 'none provided'}". Suggest doctor confirm history duration and rule out red-flag signs before finalising the assessment. (Draft summary — pending MD review.)`;
+}
+function icdListHtml(symptoms){
+  if(!symptoms.length) return '';
+  return `<div class="icd-list">${symptoms.map(s=>{
+    const m = icdMap[s]||{code:'—',conf:70};
+    return `<div class="icd-row"><span>${s} → <span class="icd-code">${m.code}</span></span>
+      <span style="display:flex;align-items:center;">${m.conf}% <span class="conf-bar"><span class="conf-fill" style="width:${m.conf}%"></span></span></span></div>`;
+  }).join('')}</div>`;
+}
+
+/* ==================================================================
+   PATIENT LOGIN
+   ================================================================== */
+document.getElementById('patientLoginBtn').addEventListener('click', ()=>{
+  const nameRaw = document.getElementById('patientLoginName').value.trim();
+  if(!nameRaw){ return; }
+  let match = patients.find(p=>p.name.toLowerCase()===nameRaw.toLowerCase());
+  if(!match){
+    match = { id:'p_'+Date.now(), name:nameRaw, age:'—', gender:'—', village:'—', history:'First-time patient — no prior records.', visits:[], today:null };
+    patients.push(match);
+  }
+  currentPatient = match;
+  document.getElementById('patientLoginError').style.display='none';
+  document.getElementById('logoutBtn').style.display='inline-block';
+  document.getElementById('navPatientLoginBtn').style.display='none';
+  document.getElementById('navDoctorLoginBtn').style.display='none';
+  const chip = document.getElementById('loggedInChip');
+  chip.style.display='inline-block'; chip.className='user-chip'; chip.textContent = '👤 '+match.name;
+  document.getElementById('patName').textContent = match.name;
+  document.getElementById('patAvatar').textContent = match.name.charAt(0).toUpperCase();
+  showView('view-patientDashboard');
+  setPatientSub('overview');
+});
+
+/* ==================================================================
+   DOCTOR LOGIN
+   ================================================================== */
+document.getElementById('doctorLoginBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('doctorLoginName').value.trim() || 'Dr. Menon';
+  currentDoctor = name;
+  document.getElementById('logoutBtn').style.display='inline-block';
+  document.getElementById('navPatientLoginBtn').style.display='none';
+  document.getElementById('navDoctorLoginBtn').style.display='none';
+  const chip = document.getElementById('loggedInChip');
+  chip.style.display='inline-block'; chip.className='user-chip'; chip.textContent = '🩺 '+name;
+  document.getElementById('docName').textContent = name;
+  document.getElementById('docAvatar').textContent = name.replace('Dr.','').trim().charAt(0).toUpperCase();
+  showView('view-doctorDashboard');
+  setDoctorSub('overview');
+});
+
+/* ==================================================================
+   PATIENT DASHBOARD
+   ================================================================== */
+document.querySelectorAll('[data-psub]').forEach(btn=>{
+  btn.addEventListener('click', ()=> setPatientSub(btn.dataset.psub));
+});
+function setPatientSub(sub){
+  document.querySelectorAll('[data-psub]').forEach(b=>b.classList.toggle('active', b.dataset.psub===sub));
+  const el = document.getElementById('patientMain');
+  const p = currentPatient;
+  if(sub==='overview'){
+    const t = p.today;
+    el.innerHTML = `
+      <h2>Welcome back, ${p.name.split(' ')[0]}</h2>
+      <p class="sub">Here's a quick look at where things stand.</p>
+      <div class="grid-3" style="margin-bottom:18px;">
+        <div class="stat-card"><div class="num">${p.visits.length + (t?1:0)}</div><div class="lbl">Total visits on file</div></div>
+        <div class="stat-card"><div class="num">${t ? (t.queueStatus==='serving'?'In room':'#'+ (patients.filter(x=>x.today && x.today.queueStatus==='waiting' && x.today.arrival<=t.arrival).length)) : '—'}</div><div class="lbl">${t ? 'Today\\'s queue status' : 'No visit today'}</div></div>
+        <div class="stat-card"><div class="num">${p.visits.length ? p.visits[p.visits.length-1].date : '—'}</div><div class="lbl">Last recorded visit</div></div>
+      </div>
+      ${t ? `<div class="card-block"><h4>Today's check-in</h4>
+        <div class="chip-row" style="margin-bottom:10px;">${t.symptoms.map(s=>`<div class="chip on">${s}</div>`).join('')}</div>
+        <p style="font-size:13px; margin:0;">Status: <b>${t.queueStatus==='serving' ? 'In consultation now' : 'Waiting · est. '+t.estWait+' min'}</b></p>
+      </div>` : `<div class="info-note">You haven't checked in today. Use <b>New Visit</b> in the sidebar to start a case.</div>`}
+    `;
+  } else if(sub==='history'){
+    const allVisits = [...p.visits];
+    if(p.today) allVisits.push({date:p.today.date+' (today)', vitals:p.today.vitals, symptoms:p.today.symptoms, notes:p.today.notes, summary:p.today.summary, rx:p.today.rx});
+    el.innerHTML = `
+      <h2>Medical history</h2>
+      <p class="sub">${p.history}</p>
+      ${allVisits.length ? `<div class="timeline">${allVisits.slice().reverse().map(v=>`
+        <div class="tl-item"><div class="tl-date">${v.date}</div>
+          <div class="tl-body">
+            <h4>${v.symptoms.join(', ') || 'General checkup'}</h4>
+            <div class="vitals-row" style="margin-bottom:8px;">
+              <div class="vital-pill"><div class="v">${v.vitals.bp}</div><div class="l">BP</div></div>
+              <div class="vital-pill"><div class="v">${v.vitals.pulse}</div><div class="l">Pulse</div></div>
+              <div class="vital-pill"><div class="v">${v.vitals.temp}</div><div class="l">Temp</div></div>
+              <div class="vital-pill"><div class="v">${v.vitals.spo2}</div><div class="l">SpO2</div></div>
+            </div>
+            <p style="font-size:13px; margin:0 0 8px;">${v.notes || '—'}</p>
+            <p style="font-size:12.5px; color:var(--text-muted); margin:0 0 8px;"><b>Doctor's summary:</b> ${v.summary || 'Pending review'}</p>
+            ${v.rx && v.rx.length ? `<p style="font-size:12.5px; margin:0;"><b>Prescribed:</b> ${v.rx.join('; ')}</p>` : ''}
+          </div>
+        </div>`).join('')}</div>` : `<div class="info-note">No past visits on file yet — this looks like your first time here.</div>`}
+    `;
+  } else if(sub==='newvisit'){
+    el.innerHTML = `
+      <h2>New visit</h2>
+      <p class="sub">Fill this in like you would at the clinic kiosk.</p>
+      <div class="card-block"><h4>Vitals</h4>
+        <div class="vital-grid">
+          <div class="field"><label>Blood pressure</label><input id="nv_bp" placeholder="120/80"></div>
+          <div class="field"><label>Pulse (bpm)</label><input id="nv_pulse" placeholder="76"></div>
+          <div class="field"><label>Temperature</label><input id="nv_temp" placeholder="98.6°F"></div>
+          <div class="field"><label>SpO2</label><input id="nv_spo2" placeholder="98%"></div>
+        </div>
+      </div>
+      <div class="card-block"><h4>Symptoms</h4>
+        <div class="chip-row" id="nvChips">${symptomOptions.map(s=>`<div class="chip" data-s="${s}">${s}</div>`).join('')}</div>
+        <div id="nvIcd"></div>
+      </div>
+      <div class="card-block"><h4>Notes</h4>
+        <div class="field"><textarea id="nv_notes" rows="3" placeholder="Describe how you're feeling..."></textarea></div>
+      </div>
+      <button class="btn btn-primary" id="nvSaveBtn">Save & join today's queue</button>
+      <div id="nvConfirm" style="display:none; margin-top:14px;" class="info-note">Saved! Check <b>Overview</b> for your queue status, or view it live on the doctor's OPD Queue.</div>
+    `;
+    let nvSymptoms = [];
+    document.querySelectorAll('#nvChips .chip').forEach(c=>{
+      c.addEventListener('click', ()=>{
+        const s = c.dataset.s;
+        if(nvSymptoms.includes(s)) nvSymptoms = nvSymptoms.filter(x=>x!==s); else nvSymptoms.push(s);
+        c.classList.toggle('on');
+        document.getElementById('nvIcd').innerHTML = icdListHtml(nvSymptoms);
+      });
+    });
+    document.getElementById('nvSaveBtn').addEventListener('click', ()=>{
+      const vitals = {bp:document.getElementById('nv_bp').value||'—', pulse:document.getElementById('nv_pulse').value||'—', temp:document.getElementById('nv_temp').value||'—', spo2:document.getElementById('nv_spo2').value||'—'};
+      const notes = document.getElementById('nv_notes').value;
+      if(p.today){ p.visits.push({date:p.today.date, vitals:p.today.vitals, symptoms:p.today.symptoms, notes:p.today.notes, summary:p.today.summary, rx:p.today.rx}); }
+      const now = new Date();
+      p.today = { vitals, symptoms:[...nvSymptoms], notes, flag: nvSymptoms.includes('Fever') || nvSymptoms.length>=4,
+        confidence: avgConfidence(nvSymptoms), summary: generateAISummary(p, nvSymptoms, vitals, notes), rx:[],
+        queueStatus:'waiting', arrival: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+        estWait: 20 + patients.filter(x=>x.today && x.today.queueStatus==='waiting').length*8,
+        date: now.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}), isNew:true };
+      document.getElementById('nvConfirm').style.display='block';
+    });
+  } else if(sub==='scan'){
+    renderOcrPanel(el);
+  } else if(sub==='support'){
+    el.innerHTML = `
+      <h2>Support chat</h2>
+      <p class="sub">Ask about OPD timings, visit prep, or general questions.</p>
+      <div class="chat-frame-box">
+        <iframe src="https://customer-support-bot-q2ol.onrender.com/" id="chatFramePatient" title="AyushSaarthi support chatbot"></iframe>
+        <div class="chat-fallback" id="chatFallbackPatient">
+          The chatbot opens in a new tab on some networks.<br><br>
+          <a href="https://customer-support-bot-q2ol.onrender.com/" target="_blank" class="btn btn-primary" style="text-decoration:none;display:inline-block;">Open chatbot ↗</a>
+        </div>
+      </div>
+    `;
+    setupChatFallback('chatFramePatient','chatFallbackPatient');
+  }
+}
+
+/* ==================================================================
+   OCR (shared)
+   ================================================================== */
+function renderOcrPanel(el){
+  el.innerHTML = `
+    <h2>Scan a prescription or report</h2>
+    <p class="sub">Upload an old paper document — it's read automatically and added to your history.</p>
+    <div class="ocr-wrap">
+      <div class="ocr-upload">
+        <div style="font-size:32px;">📄</div>
+        <p style="font-size:13.5px; color:var(--text-muted); margin:8px 0 14px;">Drop an image or use a sample document</p>
+        <input type="file" accept="image/*" id="ocrFileInput" style="display:none;">
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="ocrUploadBtn">Upload photo</button>
+          <button class="btn btn-blue" id="ocrSampleBtn">Use sample report</button>
+        </div>
+        <img id="ocrPreview" style="display:none;">
+        <div class="scan-progress" id="ocrProgress"><div class="bar" id="ocrProgressBar"></div></div>
+        <div id="ocrScanLabel" style="font-size:12px;color:var(--saffron-deep); margin-top:8px; display:none;">Scanning document...</div>
+      </div>
+      <div class="ocr-result">
+        <div class="card-block" id="ocrResultCard" style="display:none;">
+          <h4>Extracted data <span class="lang-tag" id="ocrLangTag">Hindi + English</span></h4>
+          <div class="ocr-field-row"><span class="k">Doctor</span><span id="ocrDoctor">—</span></div>
+          <div class="ocr-field-row"><span class="k">Date</span><span id="ocrDate">—</span></div>
+          <div class="ocr-field-row"><span class="k">Medicines</span><span id="ocrMeds">—</span></div>
+          <div class="ocr-field-row"><span class="k">OCR confidence</span><span id="ocrConf">—</span></div>
+          <div class="review-actions"><button class="btn btn-primary" id="ocrSaveBtn">Add to my history</button></div>
+        </div>
+        <div class="card-block" id="ocrEmptyCard"><h4>Nothing scanned yet</h4><p style="font-size:12.5px; color:var(--text-muted); margin:0;">Extracted medicines and notes will appear here for you to confirm.</p></div>
+      </div>
+    </div>`;
+  document.getElementById('ocrUploadBtn').addEventListener('click', ()=>document.getElementById('ocrFileInput').click());
+  document.getElementById('ocrFileInput').addEventListener('change', e=>{
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{ const img=document.getElementById('ocrPreview'); img.src=ev.target.result; img.style.display='block'; runOcrScan(); };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('ocrSampleBtn').addEventListener('click', ()=>{
+    const img = document.getElementById('ocrPreview');
+    img.src = "data:image/svg+xml;utf8,"+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='240'><rect width='400' height='240' fill='#fdfaf0'/><text x='20' y='30' font-family='monospace' font-size='14'>Dr. R. Sharma — Ayush Clinic</text><text x='20' y='55' font-family='monospace' font-size='12'>Date: 04/09/2026</text><line x1='20' y1='70' x2='380' y2='70' stroke='#ccc'/><text x='20' y='95' font-family='cursive' font-size='16'>Rx: Erandapaka 1 tsp HS</text><text x='20' y='120' font-family='cursive' font-size='16'>Sesame oil massage BD x 14 days</text><text x='20' y='145' font-family='cursive' font-size='16'>Avoid cold, raw food</text></svg>`);
+    img.style.display='block'; runOcrScan();
+  });
+  function runOcrScan(){
+    document.getElementById('ocrResultCard').style.display='none';
+    document.getElementById('ocrEmptyCard').style.display='block';
+    const prog=document.getElementById('ocrProgress'), bar=document.getElementById('ocrProgressBar'), label=document.getElementById('ocrScanLabel');
+    prog.classList.add('show'); label.style.display='block'; bar.style.width='0%';
+    requestAnimationFrame(()=>{ bar.style.width='100%'; });
+    setTimeout(()=>{
+      prog.classList.remove('show'); label.style.display='none';
+      document.getElementById('ocrEmptyCard').style.display='none';
+      document.getElementById('ocrResultCard').style.display='block';
+      document.getElementById('ocrDoctor').textContent='Dr. R. Sharma';
+      document.getElementById('ocrDate').textContent='04/09/2026';
+      document.getElementById('ocrMeds').textContent='Erandapaka (1 tsp, bedtime)';
+      document.getElementById('ocrConf').textContent='93% match';
+    }, 1500);
+  }
+  document.getElementById('ocrSaveBtn').addEventListener('click', ()=>{
+    if(currentPatient){
+      currentPatient.visits.push({date:'04 Sep 2026 (scanned)', vitals:{bp:'—',pulse:'—',temp:'—',spo2:'—'}, symptoms:[], notes:'Scanned prescription from Dr. R. Sharma.', summary:'Digitised from a paper prescription via OCR.', rx:['Erandapaka - 1 tsp at bedtime','Sesame oil massage BD x14 days']});
+    }
+    const btn = document.getElementById('ocrSaveBtn'); btn.textContent='✓ Added'; btn.disabled=true;
+  });
+}
+
+/* ==================================================================
+   DOCTOR DASHBOARD
+   ================================================================== */
+document.querySelectorAll('[data-dsub]').forEach(btn=>{
+  btn.addEventListener('click', ()=> setDoctorSub(btn.dataset.dsub));
+});
+function checkedInPatients(){ return patients.filter(p=>p.today); }
+
+function setDoctorSub(sub){
+  document.querySelectorAll('[data-dsub]').forEach(b=>b.classList.toggle('active', b.dataset.dsub===sub));
+  const el = document.getElementById('doctorMain');
+  if(sub==='overview'){
+    const list = checkedInPatients();
+    const waiting = list.filter(p=>p.today.queueStatus==='waiting').length;
+    const done = list.filter(p=>p.today.queueStatus==='done').length;
+    const flagged = list.filter(p=>p.today.flag).length;
+    const symptomCount = {};
+    list.forEach(p=>p.today.symptoms.forEach(s=> symptomCount[s]=(symptomCount[s]||0)+1));
+    const topSymptoms = Object.entries(symptomCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    el.innerHTML = `
+      <h2>Overview</h2>
+      <p class="sub">Today's clinic snapshot.</p>
+      <div class="grid-3" style="margin-bottom:18px;">
+        <div class="stat-card"><div class="num">${list.length}</div><div class="lbl">Checked in today</div></div>
+        <div class="stat-card"><div class="num">${waiting}</div><div class="lbl">Currently waiting</div></div>
+        <div class="stat-card"><div class="num">${done}</div><div class="lbl">Seen today</div></div>
+        <div class="stat-card"><div class="num">${flagged}</div><div class="lbl">Flagged cases</div></div>
+      </div>
+      <div class="card-block"><h4>Most common symptoms today</h4>
+        ${topSymptoms.length ? topSymptoms.map(([s,c])=>`
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <span style="font-size:13px; width:120px;">${s}</span>
+            <div style="flex:1; background:var(--bg-soft); border-radius:4px; height:8px;"><div style="width:${(c/list.length)*100}%; background:var(--saffron); height:100%; border-radius:4px;"></div></div>
+            <span style="font-size:12px; color:var(--text-muted);">${c}</span>
+          </div>`).join('') : '<p style="font-size:13px;color:var(--text-muted);">No check-ins yet today.</p>'}
+      </div>
+    `;
+  } else if(sub==='queue'){
+    renderQueuePanel(el);
+  } else if(sub==='patients'){
+    renderPatientsPanel(el);
+  }
+}
+
+function renderQueuePanel(el){
+  el.innerHTML = `
+    <h2>Live OPD queue</h2>
+    <p class="sub">Who's waiting, who's in consultation.</p>
+    <div class="now-serving" id="nowServingBox">
+      <div><div class="label">Now in consultation</div><div class="name" id="nowServingName">—</div><div class="room" id="nowServingRoom">—</div></div>
+      <button class="btn btn-saffron" id="callNextBtn">Call next patient →</button>
+    </div>
+    <table class="queue-table"><thead><tr><th>Patient</th><th>Arrived</th><th>Est. wait</th><th>Status</th></tr></thead><tbody id="queueTableBody"></tbody></table>
+  `;
+  renderQueueTable();
+  document.getElementById('callNextBtn').addEventListener('click', ()=>{
+    const serving = checkedInPatients().find(p=>p.today.queueStatus==='serving');
+    if(serving) serving.today.queueStatus='done';
+    const waitingList = checkedInPatients().filter(p=>p.today.queueStatus==='waiting');
+    if(waitingList.length) waitingList[0].today.queueStatus='serving';
+    renderQueueTable();
+  });
+}
+function renderQueueTable(){
+  const list = checkedInPatients();
+  const serving = list.find(p=>p.today.queueStatus==='serving');
+  const waitingList = list.filter(p=>p.today.queueStatus==='waiting');
+  if(serving){
+    document.getElementById('nowServingName').textContent = serving.name;
+    document.getElementById('nowServingRoom').textContent = `Consultation Room 2 · ${currentDoctor||'Dr. Menon'} · since ${serving.today.arrival}`;
+  } else {
+    document.getElementById('nowServingName').textContent = 'Room free';
+    document.getElementById('nowServingRoom').textContent = 'No patient currently in consultation';
+  }
+  document.getElementById('callNextBtn').disabled = waitingList.length===0;
+  const rows = list.filter(p=>p.today.queueStatus!=='done').sort((a,b)=>({serving:0,waiting:1})[a.today.queueStatus]-({serving:0,waiting:1})[b.today.queueStatus]);
+  document.getElementById('queueTableBody').innerHTML = rows.map(p=>`
+    <tr><td>${p.name} ${p.today.flag?'<span class="flag-dot"></span>':''}</td><td>${p.today.arrival}</td>
+      <td>${p.today.queueStatus==='serving'?'In room':p.today.estWait+' min'}</td>
+      <td><span class="status-tag ${p.today.queueStatus==='serving'?'status-serving':'status-waiting'}">${p.today.queueStatus==='serving'?'In consultation':'Waiting'}</span></td></tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Queue is empty</td></tr>';
+}
+
+function renderPatientsPanel(el){
+  el.innerHTML = `<h2>Patients</h2><p class="sub">Everyone checked in today, with AI-drafted summaries.</p>
+    <div class="two-col"><div id="patListCol"></div><div id="patDetailCol"></div></div>`;
+  const list = checkedInPatients();
+  if(!activeDoctorPatientId && list.length) activeDoctorPatientId = list[0].id;
+  document.getElementById('patListCol').innerHTML = list.map(p=>`
+    <div class="patient-list-row ${p.id===activeDoctorPatientId?'active':''}" data-id="${p.id}">
+      <div><div class="p-name">${p.name} ${p.today.isNew?'<span class="new-badge">NEW</span>':''}</div><div class="p-meta">${p.age} yrs · ${p.gender} · ${p.village}</div></div>
+      ${p.today.flag?'<span class="flag-dot"></span>':''}
+    </div>`).join('') || '<p style="font-size:13px;color:var(--text-muted);">No patients checked in yet.</p>';
+  document.querySelectorAll('.patient-list-row').forEach(r=>{
+    r.addEventListener('click', ()=>{ activeDoctorPatientId = r.dataset.id; renderPatientsPanel(el); });
+  });
+  renderDoctorPatientDetail();
+}
+function renderDoctorPatientDetail(){
+  const wrap = document.getElementById('patDetailCol');
+  if(!wrap) return;
+  const p = patients.find(x=>x.id===activeDoctorPatientId);
+  if(!p || !p.today){ wrap.innerHTML = '<div class="card-block">Select a patient to view their case.</div>'; return; }
+  const t = p.today;
+  wrap.innerHTML = `
+    <div class="card-block">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+        <div><h3 style="margin:0; font-size:19px;">${p.name}</h3><div style="font-size:12px;color:var(--text-muted);">${p.age} yrs · ${p.gender} · ${p.village} ${t.flag?'· <span style="color:var(--red);">Flagged</span>':''}</div></div>
+        <div class="lang-toggle"><button data-lang="en" class="${currentLang==='en'?'on':''}">EN</button><button data-lang="hi" class="${currentLang==='hi'?'on':''}">हिं</button></div>
+      </div>
+      <div class="vitals-row">
+        <div class="vital-pill"><div class="v">${t.vitals.bp}</div><div class="l">BP</div></div>
+        <div class="vital-pill"><div class="v">${t.vitals.pulse}</div><div class="l">Pulse</div></div>
+        <div class="vital-pill"><div class="v">${t.vitals.temp}</div><div class="l">Temp</div></div>
+        <div class="vital-pill"><div class="v">${t.vitals.spo2}</div><div class="l">SpO2</div></div>
+      </div>
+    </div>
+    <div class="card-block"><h4>Symptoms &amp; mapped codes</h4>
+      <div class="chip-row" style="margin-bottom:8px;">${t.symptoms.map(s=>`<div class="chip on">${s}</div>`).join('') || '<span style="font-size:12px;color:var(--text-muted);">None recorded</span>'}</div>
+      ${icdListHtml(t.symptoms)}
+      <p style="font-size:13px; margin-top:10px;">${p.history}</p>
+    </div>
+    <div class="card-block"><h4>AI-drafted clinical summary</h4>
+      <div class="ai-summary-box"><span class="badge">Draft — needs MD review</span><span class="conf-badge">Confidence: ${t.confidence}%</span><br>${currentLang==='en'?t.summary:hindiNote}</div>
+      <div class="review-actions"><button class="btn btn-primary" id="approveBtn">Approve summary</button><button class="btn btn-ghost">Edit before approving</button></div>
+    </div>
+    <div class="card-block"><h4>Prescription</h4>
+      <div>${(t.rx||[]).map(r=>`<div class="rx-row"><input value="${r}" readonly></div>`).join('') || '<p style="font-size:12.5px;color:var(--text-muted);">No prescription yet.</p>'}</div>
+      <div class="rx-row"><input id="rxNew" placeholder="Add medicine / advice..."><button class="btn btn-saffron" id="rxAdd">Add</button></div>
+    </div>`;
+  wrap.querySelectorAll('.lang-toggle button').forEach(b=> b.addEventListener('click', ()=>{ currentLang=b.dataset.lang; renderDoctorPatientDetail(); }));
+  const ap = document.getElementById('approveBtn');
+  if(ap) ap.addEventListener('click', ()=>{ ap.textContent='✓ Approved'; ap.disabled=true; });
+  const rxAdd = document.getElementById('rxAdd');
+  if(rxAdd) rxAdd.addEventListener('click', ()=>{ const v=document.getElementById('rxNew').value.trim(); if(v){ t.rx=t.rx||[]; t.rx.push(v); renderDoctorPatientDetail(); } });
+}
+
+/* ==================================================================
+   CHAT FALLBACK
+   ================================================================== */
+function setupChatFallback(frameId, fallbackId){
+  const frame = document.getElementById(frameId);
+  let loaded = false;
+  frame.addEventListener('load', ()=>{ loaded = true; });
+  setTimeout(()=>{ if(!loaded){ frame.style.display='none'; document.getElementById(fallbackId).style.display='block'; } }, 6000);
+}
+</script>
+</body>
+</html>
